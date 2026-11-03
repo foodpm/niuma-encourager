@@ -14,6 +14,9 @@ function pickAsset(assets: { name: string; browser_download_url: string }[], pla
     const dmg = assets.find((a) => a.name.toLowerCase().endsWith('.dmg'));
     return dmg ? { name: dmg.name, url: dmg.browser_download_url } : null;
   }
+  // Windows：优先给普通用户的 NSIS 安装向导（-setup.exe），msi 作为企业静默部署备选
+  const setupExe = assets.find((a) => a.name.toLowerCase().endsWith('-setup.exe'));
+  if (setupExe) return { name: setupExe.name, url: setupExe.browser_download_url };
   const msi = assets.find((a) => a.name.toLowerCase().endsWith('.msi'));
   if (msi) return { name: msi.name, url: msi.browser_download_url };
   const exe = assets.find((a) => a.name.toLowerCase().endsWith('.exe'));
