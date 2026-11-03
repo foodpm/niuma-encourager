@@ -136,6 +136,7 @@ export function renderDashboard(root: HTMLElement, profile: Profile, goSettings:
     }
 
     // 金额
+    animator.setActive(t.status === "working");
     animator.setTarget(t.earnedToday);
     (root.querySelector("#rate") as HTMLElement).textContent = t.ratePerSec.toFixed(4);
 

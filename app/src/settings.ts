@@ -65,7 +65,7 @@ export function renderSettings(root: HTMLElement, profile: Profile, onBack: (p: 
         </div>
       </div>
       <div class="sticker settings-section about-note">
-        <b>牛马鼓励器 v0.1.0</b><br>
+        <b>牛马鼓励器 v0.1.1</b><br>
         把月薪拆到每一秒，实时跳动地"赚"给你看。<br>
         仅供娱乐，不构成任何劳动报酬依据。
       </div>

@@ -8,6 +8,7 @@ export class MoneyAnimator {
   private lastWhole = 0;
   private el: HTMLElement;
   private running = false;
+  private active = false; // 是否在计薪（决定毛刺抖动）
 
   constructor(el: HTMLElement) {
     this.el = el;
@@ -16,6 +17,11 @@ export class MoneyAnimator {
   setTarget(v: number) {
     this.target = v;
     this.start();
+  }
+
+  /** 计薪状态：仅 working 时为 true，毛刺只在赚钱时出现 */
+  setActive(v: boolean) {
+    this.active = v;
   }
 
   /** 立即追平（用于设置变更等场景） */
@@ -35,9 +41,6 @@ export class MoneyAnimator {
         this.display += diff * 0.15;
       }
       this.render();
-      if (Math.abs(this.target - this.display) < 0.00005 && Math.abs(this.target - this.display) < 1e-9) {
-        // 追平也继续跑（真实值会持续增长），只是渲染便宜
-      }
       this.raf = requestAnimationFrame(loop);
     };
     this.raf = requestAnimationFrame(loop);
@@ -51,8 +54,8 @@ export class MoneyAnimator {
   private render() {
     const v = this.display;
     const whole = Math.floor(v);
-    // 最低位毛刺：万分位在 ±3 范围抖动
-    const jitter = whole === Math.floor(this.target) ? (Math.random() * 6 - 3) : 0;
+    // 最低位毛刺：仅计薪时在 ±3 范围抖动；暂停/下班/休息日 → 数字完全静止
+    const jitter = this.active ? (Math.random() * 6 - 3) : 0;
     const shown = Math.max(0, v + jitter * 0.0001);
     const text = shown.toFixed(4);
     if (this.el.textContent !== text) this.el.textContent = text;

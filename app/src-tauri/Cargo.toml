@@ -1,6 +1,6 @@
 [package]
 name = "niuma-encourager"
-version = "0.1.0"
+version = "0.1.1"
 description = "牛马鼓励器 — 把月薪拆到每一秒"
 edition = "2021"
 
