@@ -7,10 +7,10 @@ pages_build_output_dir = "public"
 [[d1_databases]]
 binding = "DB"
 database_name = "niuma-stats"
-database_id = "REPLACE_WITH_YOUR_D1_DATABASE_ID"
+database_id = "7631a1c2-a0c8-4216-8afc-5db8c038661b"
 
 # [vars] 为非敏感明文变量；ADMIN_TOKEN 属于敏感信息，用：
 #   本地：cp .dev.vars.example .dev.vars
 #   生产：npx wrangler pages secret put ADMIN_TOKEN
 [vars]
-RELEASE_REPO = "OWNER/niuma-encourager"
+RELEASE_REPO = "foodpm/niuma-encourager"

@@ -65,6 +65,24 @@
     .btn-cocoa { background: var(--cocoa-900); color: var(--cream-50); }
     .btn-cocoa:hover { background: var(--cocoa-700); }
 
+    /* ---------- 内联 SVG 图标（stroke currentColor，跟随贴纸风） ---------- */
+    svg.icon {
+      width: 1.1em; height: 1.1em; flex: none;
+      fill: none; stroke: currentColor; stroke-width: 2;
+      stroke-linecap: round; stroke-linejoin: round;
+    }
+    .card .ico svg.icon { width: 30px; height: 30px; stroke-width: 1.8; }
+    .pulse-dot {
+      display: inline-block; width: 10px; height: 10px; flex: none;
+      border-radius: 50%; background: var(--ok-500);
+      border: 2px solid rgba(255, 246, 232, .9);
+      animation: pulse 1.6s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.35); opacity: .65; }
+    }
+
     /* ---------- 顶部导航 ---------- */
     nav.topbar {
       position: sticky; top: 0; z-index: 50;
@@ -189,7 +207,7 @@
       footer .container { justify-content: center; text-align: center; }
     }
     @media (prefers-reduced-motion: reduce) {
-      .hero-logo, .demo-card .blink { animation: none; }
+      .hero-logo, .demo-card .blink, .pulse-dot { animation: none; }
     }
   </style>
 </head>
@@ -200,7 +218,6 @@
         <img src="/img/logo.png" alt="牛马鼓励器 logo" />
         牛马鼓励器
       </a>
-      <a class="btn btn-amber" href="/admin" style="padding: 8px 16px; font-size: 14px;">管理后台</a>
     </div>
   </nav>
 
@@ -211,11 +228,21 @@
       <p class="slogan">每一秒，都在为你打工</p>
       <div class="dl-row">
         <a class="btn btn-amber btn-dl" href="/api/dl/macos">
-           macOS
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M7 4.5c0-.8.7-1.5 1.6-1.5h1.5v4.2c0 .4.3.8.8.8h4.2v2H9.3C8 10 7 9 7 7.7V4.5z" fill="currentColor" stroke="none" />
+            <path d="M10.1 3h3.2c1.9 0 3.7 1.3 3.7 3.3 0 1.2-.6 2.2-1.5 2.8M8.5 3c-1 .3-1.5 1-1.5 2" />
+            <path d="M12 10v10.5" />
+            <path d="M8.5 17.5 12 21l3.5-3.5" />
+          </svg>
+          macOS
           <small>macOS 12+ · .dmg</small>
         </a>
         <a class="btn btn-cocoa btn-dl" href="/api/dl/windows">
-          ⊞ Windows
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M4 6.5 10.5 5.6v5.9H4V6.5z" fill="currentColor" fill-opacity=".18" />
+            <path d="M4 6.5 10.5 5.6v5.9H4V6.5zM4 13.5h6.5v5.9L4 18.5v-5zM12 5.4 20 4.3v7.2h-8V5.4zM12 13.5h8v7.2l-8-1.1v-6.1z" />
+          </svg>
+          Windows
           <small>Windows 10+ · .msi</small>
         </a>
       </div>
@@ -230,7 +257,7 @@
         <div class="amount">¥<span id="demo-int">8,742</span>.<span id="demo-frac">3917</span></div>
         <div class="meta">
           时薪 <span class="num rate" id="demo-rate">68</span> 元 · 上午 9:00 — 下午 6:00 ·
-          <span class="blink">●</span> 在岗
+          <span class="pulse-dot" aria-hidden="true"></span> 在岗
         </div>
       </div>
     </div>
@@ -242,37 +269,73 @@
       <p class="section-sub">六个理由，让你看清每一秒的价值</p>
       <div class="grid">
         <div class="card sticker">
-          <div class="ico">💰</div>
+          <div class="ico">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="12" cy="12" r="8.5" />
+              <path d="M12 7.5v4.5l3 2" />
+              <path d="M7.5 5.2 6.2 3.6M16.5 5.2l1.3-1.6" />
+            </svg>
+          </div>
           <h3>秒薪跳动</h3>
           <p>100ms 一跳，工资实时滚动，4 位小数不糊屏。</p>
           <span class="tag">核心体验</span>
         </div>
         <div class="card sticker alt">
-          <div class="ico">⏰</div>
+          <div class="ico">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="12" cy="13" r="7.5" />
+              <path d="M12 9.5V13l2.5 1.8" />
+              <path d="M9.5 3.5h5M12 3.5v2M17.5 6.5l1.5-1.5M6.5 6.5 5 5" />
+            </svg>
+          </div>
           <h3>下班倒计时</h3>
           <p>距离下班还有 2h 14m，谁看谁清醒。</p>
           <span class="tag">摸鱼神器</span>
         </div>
         <div class="card sticker">
-          <div class="ico">📅</div>
+          <div class="ico">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+              <rect x="4" y="5.5" width="16" height="14.5" rx="2.5" />
+              <path d="M4 9.5h16M8.5 3.5v3.5M15.5 3.5v3.5" />
+              <path d="M8 13.5h2.5M13.5 13.5H16M8 16.5h2.5M13.5 16.5H16" />
+            </svg>
+          </div>
           <h3>月累计</h3>
           <p>这个月你已经挣了多少，一目了然。</p>
           <span class="tag">成就感</span>
         </div>
         <div class="card sticker amber">
-          <div class="ico">🎯</div>
+          <div class="ico">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="12" cy="12" r="7.5" />
+              <circle cx="12" cy="12" r="3" />
+              <path d="M12 4.5V2M12 22v-2.5M4.5 12H2M22 12h-2.5M6.7 6.7 5 5M19 19l-1.7-1.7M17.3 6.7 19 5M5 19l1.7-1.7" />
+            </svg>
+          </div>
           <h3>小目标</h3>
           <p>先挣它一个亿？从一顿火锅开始，达成有庆祝彩蛋。</p>
           <span class="tag">彩蛋</span>
         </div>
         <div class="card sticker">
-          <div class="ico">📌</div>
+          <div class="ico">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M9 5.5h6a1.5 1.5 0 0 1 1.5 1.5v13A1.5 1.5 0 0 1 15 21.5H9A1.5 1.5 0 0 1 7.5 20V7A1.5 1.5 0 0 1 9 5.5z" />
+              <path d="M10.5 3h3a.8.8 0 0 1 .8.8V5.5h-4.6V3.8a.8.8 0 0 1 .8-.8z" />
+              <path d="M10 10.5h4M10 13.5h4M10 16.5h2.5" />
+            </svg>
+          </div>
           <h3>托盘常驻</h3>
           <p>菜单栏 / 托盘常驻，双击随时唤出，不占任务栏。</p>
           <span class="tag">轻量</span>
         </div>
         <div class="card sticker red">
-          <div class="ico">🔒</div>
+          <div class="ico">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+              <rect x="5.5" y="10.5" width="13" height="9" rx="2" />
+              <path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5" />
+              <circle cx="12" cy="15" r="1.4" fill="currentColor" stroke="none" />
+            </svg>
+          </div>
           <h3>完全本地</h3>
           <p>不出网、不上报、不埋点，你的工资只属于你。</p>
           <span class="tag">隐私承诺</span>
@@ -311,7 +374,6 @@
   <footer>
     <div class="container">
       <span>© 2026 牛马鼓励器 · 仅供娱乐</span>
-      <span><a href="/admin">管理后台</a></span>
     </div>
   </footer>
 

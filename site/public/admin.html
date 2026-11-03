@@ -4,7 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>牛马鼓励器 · 管理后台</title>
-  <meta name="robots" content="noindex, nofollow" />
+  <meta name="robots" content="noindex, nofollow, noarchive" />
+  <meta name="referrer" content="no-referrer" />
   <link rel="icon" type="image/png" href="/img/favicon.png" />
   <style>
     :root {
@@ -57,11 +58,26 @@
     .btn-cocoa { background: var(--cocoa-900); color: var(--cream-50); }
     .btn-cocoa:hover { background: var(--cocoa-700); }
 
+    /* ---------- 内联 SVG 图标（stroke currentColor，跟随贴纸风） ---------- */
+    svg.icon {
+      width: 1.1em; height: 1.1em; flex: none;
+      fill: none; stroke: currentColor; stroke-width: 2;
+      stroke-linecap: round; stroke-linejoin: round;
+    }
+    .stat .ico svg.icon { width: 21px; height: 21px; stroke-width: 1.8; }
+    .login-card .ico svg.icon { width: 44px; height: 44px; stroke-width: 1.6; }
+
     /* ---------- 顶栏 ---------- */
     .topbar { border-bottom: 3px solid var(--cocoa-900); background: var(--cream-50); }
     .topbar .container { display: flex; align-items: center; justify-content: space-between; gap: 12px; height: 64px; }
-    .brand { display: flex; align-items: center; gap: 10px; font-weight: 900; font-size: 18px; text-decoration: none; color: var(--cocoa-900); }
-    .brand img { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--cocoa-900); }
+    /* 品牌链接保留但低调：小号、次级色、无贴纸描边 */
+    .brand {
+      display: flex; align-items: center; gap: 8px;
+      font-weight: 700; font-size: 14px; text-decoration: none;
+      color: var(--cocoa-700); opacity: .85;
+    }
+    .brand:hover { opacity: 1; }
+    .brand img { width: 26px; height: 26px; border-radius: 7px; border: 2px solid var(--cocoa-900); opacity: .9; }
     .top-actions { display: flex; align-items: center; gap: 10px; }
     .badge {
       font-size: 12px; font-weight: 800; padding: 3px 10px;
@@ -74,7 +90,7 @@
     /* ---------- 登录卡 ---------- */
     .login-wrap { display: grid; place-items: center; padding: 72px 20px; }
     .login-card { width: min(400px, 100%); padding: 32px 28px; text-align: center; }
-    .login-card .ico { font-size: 40px; }
+    .login-card .ico { display: grid; place-items: center; color: var(--amber-600); margin-bottom: 2px; }
     .login-card h1 { font-size: 24px; font-weight: 900; margin: 10px 0 6px; }
     .login-card p { color: var(--cocoa-700); font-size: 14px; margin: 0 0 20px; line-height: 1.7; }
     .login-card input {
@@ -98,7 +114,8 @@
     .stat .k { font-size: 13px; font-weight: 800; color: var(--cocoa-700); letter-spacing: 1px; }
     .stat .v { font-family: var(--font-num); font-variant-numeric: tabular-nums; font-size: 34px; font-weight: 700; margin-top: 6px; }
     .stat .s { font-size: 12px; color: var(--cocoa-700); margin-top: 4px; }
-    .stat .ico { width: 38px; height: 38px; display: grid; place-items: center; font-size: 19px; background: var(--cocoa-100); border: 2px solid var(--cocoa-900); border-radius: 10px; box-shadow: 2px 2px 0 rgba(91, 58, 30, .9); margin-bottom: 10px; }
+    .stat .ico { width: 38px; height: 38px; display: grid; place-items: center; color: var(--cocoa-900); background: var(--cocoa-100); border: 2px solid var(--cocoa-900); border-radius: 10px; box-shadow: 2px 2px 0 rgba(91, 58, 30, .9); margin-bottom: 10px; }
+    .stat.c-cocoa .ico { background: var(--cocoa-700); color: var(--cream-50); }
     .stat.c-amber { background: var(--amber-400); }
     .stat.c-cocoa { background: var(--cocoa-900); color: var(--cream-50); }
     .stat.c-cocoa .k, .stat.c-cocoa .s { color: var(--cocoa-100); }
@@ -167,13 +184,19 @@
 <body>
   <div class="topbar">
     <div class="container">
-      <a class="brand" href="/">
-        <img src="/img/logo.png" alt="牛马鼓励器 logo" />
-        牛马鼓励器 · 后台
+      <a class="brand" href="/" title="返回官网">
+        <img src="/img/logo.png" alt="" />
+        牛马鼓励器
       </a>
       <div class="top-actions" id="top-actions" style="display: none;">
         <span class="badge ok" id="token-badge" title="">已登录</span>
-        <button class="btn" id="btn-refresh">↻ 刷新</button>
+        <button class="btn" id="btn-refresh">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M19.5 12a7.5 7.5 0 1 1-2.2-5.3" />
+            <path d="M19.5 3.5v3.7h-3.7" />
+          </svg>
+          刷新
+        </button>
         <button class="btn btn-cocoa" id="btn-logout">退出</button>
       </div>
     </div>
@@ -182,7 +205,14 @@
   <!-- 未登录 -->
   <div class="login-wrap" id="login-view">
     <form class="login-card sticker" id="login-form">
-      <div class="ico">🔐</div>
+      <div class="ico">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+          <rect x="5" y="10.5" width="14" height="9.5" rx="2.2" />
+          <path d="M8.5 10.5V7.5a3.5 3.5 0 0 1 7 0v3" />
+          <path d="M12 14.2v2.6" />
+          <circle cx="12" cy="15.5" r="1.3" fill="currentColor" stroke="none" />
+        </svg>
+      </div>
       <h1>管理后台</h1>
       <p>输入管理 Token 查看下载统计。<br />Token 保存在本机 localStorage，不会上传。</p>
       <input type="password" id="token-input" placeholder="ADMIN_TOKEN" autocomplete="current-password" autofocus />
@@ -202,25 +232,48 @@
 
     <div class="stat-grid">
       <div class="stat sticker c-amber">
-        <div class="ico">📦</div>
+        <div class="ico">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 3 4 7v2.2l8 4 8-4V7l-8-4z" />
+            <path d="M4 12.4V17c0 .5.3 1 .8 1.2l6.7 2.6c.3.1.7.1 1 0l6.7-2.6c.5-.2.8-.7.8-1.2v-4.6" />
+            <path d="M12 13.2v7.6" />
+          </svg>
+        </div>
         <div class="k">总下载</div>
         <div class="v" id="st-total">—</div>
         <div class="s">mac <span id="st-total-mac">—</span> · win <span id="st-total-win">—</span></div>
       </div>
       <div class="stat sticker">
-        <div class="ico">☀️</div>
+        <div class="ico">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="12" r="4" fill="currentColor" stroke="none" />
+            <path d="M12 3.5v2.2M12 18.3v2.2M3.5 12h2.2M18.3 12h2.2M6 6l1.6 1.6M16.4 16.4 18 18M18 6l-1.6 1.6M7.6 16.4 6 18" />
+          </svg>
+        </div>
         <div class="k">今日下载</div>
         <div class="v" id="st-today">—</div>
         <div class="s">mac <span id="st-today-mac">—</span> · win <span id="st-today-win">—</span></div>
       </div>
       <div class="stat sticker">
-        <div class="ico">📆</div>
+        <div class="ico">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+            <rect x="4" y="5.5" width="16" height="14.5" rx="2.5" />
+            <path d="M4 9.5h16M8.5 3.5v3.5M15.5 3.5v3.5" />
+            <path d="M8 13.5h8M8 16.5h5" />
+          </svg>
+        </div>
         <div class="k">本周下载</div>
         <div class="v" id="st-week">—</div>
         <div class="s">近 7 天（含今天）</div>
       </div>
       <div class="stat sticker c-red">
-        <div class="ico">🧍</div>
+        <div class="ico">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="8" r="3.5" />
+            <path d="M5.5 19.5c.6-3.4 3.3-5.5 6.5-5.5s5.9 2.1 6.5 5.5" />
+            <path d="M9 8h.01M15 8h.01" />
+          </svg>
+        </div>
         <div class="k">今日独立 IP</div>
         <div class="v" id="st-uv">—</div>
         <div class="s">ip-hash 去重</div>
@@ -248,7 +301,7 @@
           </thead>
           <tbody id="tbl-body"></tbody>
         </table>
-        <div class="empty-tip" id="tbl-empty" style="display:none;">还没有下载数据，去官网吆喝两声吧 🐮</div>
+        <div class="empty-tip" id="tbl-empty" style="display:none;">还没有下载数据，等第一位打工人来下载吧。</div>
       </div>
     </div>
   </main>
