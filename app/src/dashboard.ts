@@ -3,6 +3,7 @@
  */
 import { invoke, onTick, type Profile, type Tick } from "./api";
 import { MoneyAnimator, formatCountdown, hoursLabel } from "./money";
+import { icons } from "./icons";
 
 const SKIN = {
   meme: {
@@ -30,8 +31,8 @@ const SKIN = {
 export function renderDashboard(root: HTMLElement, profile: Profile, goSettings: () => void) {
   root.innerHTML = `
     <div class="topbar">
-      <div class="brand"><span class="logo-emoji">🐂🐎</span><span id="brand-name">牛马鼓励器</span></div>
-      <button class="icon-btn" id="btn-settings" title="设置">⚙</button>
+      <div class="brand"><img class="logo-img" src="/logo.png" alt=""><span id="brand-name">牛马鼓励器</span></div>
+      <button class="icon-btn" id="btn-settings" title="设置">${icons.gear}</button>
     </div>
     <div class="view">
       <div class="dateline num" id="dateline">--</div>
@@ -48,7 +49,7 @@ export function renderDashboard(root: HTMLElement, profile: Profile, goSettings:
         <div class="rate-line num">当前赚钱速度 ¥<span id="rate">0.0000</span> / 秒</div>
         <div class="target-line" id="target-line" style="display:none"></div>
       </div>
-      <button class="btn btn--dark btn--full" id="btn-pause">${SKIN[profile.skin].pauseBtn}</button>
+      <button class="btn btn--dark btn--full" id="btn-pause">${icons.pause} ${SKIN[profile.skin].pauseBtn}</button>
       <div class="sticker progress-card">
         <div class="progress-head">
           <span>今日工时进度 <b class="num" id="progress-pct">0.0%</b></span>
@@ -68,7 +69,7 @@ export function renderDashboard(root: HTMLElement, profile: Profile, goSettings:
         <span>今日满勤可得 ¥<span class="num" id="full-day">0.00</span></span>
       </div>
       <div class="foot-info" style="justify-content:center">
-        <span style="opacity:.6">仅供娱乐，不构成任何劳动报酬依据 🐂</span>
+        <span style="opacity:.6">仅供娱乐，不构成任何劳动报酬依据 <img class="logo-img logo-img--sm" src="/logo.png" alt=""></span>
       </div>
     </div>
   `;
@@ -90,11 +91,11 @@ export function renderDashboard(root: HTMLElement, profile: Profile, goSettings:
   const updatePauseBtn = (status: string) => {
     const skin = SKIN[profile.skin];
     if (status === "break") {
-      pauseBtn.textContent = skin.resumeBtn;
+      pauseBtn.innerHTML = `${icons.play} ${skin.resumeBtn}`;
       pauseBtn.classList.remove("btn--dark");
       pauseBtn.classList.add("btn--red");
     } else {
-      pauseBtn.textContent = skin.pauseBtn;
+      pauseBtn.innerHTML = `${icons.pause} ${skin.pauseBtn}`;
       pauseBtn.classList.add("btn--dark");
       pauseBtn.classList.remove("btn--red");
     }
@@ -127,9 +128,9 @@ export function renderDashboard(root: HTMLElement, profile: Profile, goSettings:
     if (t.status === "working") {
       cd.textContent = `${skin.countdownPrefix} ${formatCountdown(t.countdownSec)}`;
     } else if (t.status === "break") {
-      cd.textContent = "暂停期间不计薪，回来继续 💰";
+      cd.innerHTML = `${icons.coin} 暂停期间不计薪，回来继续`;
     } else if (t.status === "off") {
-      cd.textContent = "今天辛苦了，明天再战 🐎";
+      cd.innerHTML = `${icons.moon} 今天辛苦了，明天再战`;
     } else {
       cd.textContent = "好好休息，钱包在周末也睡着";
     }
@@ -142,9 +143,9 @@ export function renderDashboard(root: HTMLElement, profile: Profile, goSettings:
     const tl = root.querySelector("#target-line") as HTMLElement;
     if (t.targetName && t.targetEtaSec != null) {
       tl.style.display = "";
-      tl.textContent =
+      tl.innerHTML =
         t.targetEtaSec === 0
-          ? `🎉 ${t.targetName}已经赚回来了！`
+          ? `${icons.sparkle} ${t.targetName}已经赚回来了！`
           : `再过 ${formatCountdown(t.targetEtaSec)}，${t.targetName}就赚回来了。`;
     } else {
       tl.style.display = "none";

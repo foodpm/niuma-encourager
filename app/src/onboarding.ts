@@ -2,6 +2,7 @@
  * 首次启动三步引导（方案 §3.1）
  */
 import { invoke, defaultProfile, type Profile } from "./api";
+import { icons } from "./icons";
 
 export function isOnboardingNeeded(p: Profile): boolean {
   return !p.onboardingDone;
@@ -20,14 +21,14 @@ export function renderOnboarding(root: HTMLElement, existing: Profile, onDone: (
   ];
 
   root.innerHTML = `
-    <div class="topbar"><div class="brand"><span class="logo-emoji">🐂🐎</span>牛马鼓励器</div></div>
+    <div class="topbar"><div class="brand"><img class="logo-img" src="/logo.png" alt="牛马鼓励器">牛马鼓励器</div></div>
     <div class="steps"><i data-s="0"></i><i data-s="1"></i><i data-s="2"></i></div>
     <div class="view">
       <div class="sticker form-card" id="ob-card"></div>
     </div>
-    <div class="view" style="flex-direction:row; gap:10px; padding-top:0;">
-      <button class="btn btn--ghost" id="ob-back" style="display:none">上一步</button>
-      <button class="btn btn--full" id="ob-next">下一步</button>
+    <div class="footer-bar">
+      <button class="btn btn--ghost" id="ob-back">上一步</button>
+      <button class="btn btn--grow" id="ob-next">下一步</button>
     </div>
   `;
 
@@ -38,7 +39,7 @@ export function renderOnboarding(root: HTMLElement, existing: Profile, onDone: (
   const render = () => {
     root.querySelectorAll(".steps i").forEach((el, i) => el.classList.toggle("on", i <= step));
     backBtn.style.display = step === 0 ? "none" : "";
-    nextBtn.textContent = step === 2 ? "开始搬砖 🐂" : "下一步";
+    nextBtn.innerHTML = step === 2 ? `开始搬砖 ${icons.sparkle}` : "下一步";
     if (step === 0) renderStep1();
     else if (step === 1) renderStep2();
     else renderStep3();
@@ -92,7 +93,7 @@ export function renderOnboarding(root: HTMLElement, existing: Profile, onDone: (
         <input type="checkbox" id="f-lunch" ${draft.lunchPaid ? "checked" : ""} style="width:22px;height:22px">
       </div>
       <div class="field switch-row">
-        <div><label>加班 1.5 倍模式</label><div class="desc">休息日/下班后搬砖按 1.5x 跳 🐎</div></div>
+        <div><label>加班 1.5 倍模式</label><div class="desc">休息日/下班后搬砖按 1.5x 计薪</div></div>
         <input type="checkbox" id="f-ot" ${draft.overtimeEnabled ? "checked" : ""} style="width:22px;height:22px">
       </div>
     `;

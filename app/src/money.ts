@@ -68,10 +68,19 @@ export class MoneyAnimator {
   }
 }
 
-/** 倒计时格式化：X小时Y分Z秒 */
+/** 倒计时格式化：X小时Y分Z秒；超长时长自动降级为天/年 */
 export function formatCountdown(totalSec: number): string {
   const s = Math.max(0, Math.floor(totalSec));
   const h = Math.floor(s / 3600);
+  if (h >= 24 * 365) {
+    const years = Math.floor(h / (24 * 365));
+    const days = Math.floor((h % (24 * 365)) / 24);
+    return `约 ${years} 年零 ${days} 天`;
+  }
+  if (h >= 24 * 30) {
+    const days = Math.floor(h / 24);
+    return `约 ${days} 天`;
+  }
   const m = Math.floor((s % 3600) / 60);
   const sec = s % 60;
   if (h > 0) return `${h}小时${m}分${sec}秒`;

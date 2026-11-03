@@ -95,6 +95,20 @@ input:focus, select:focus { outline: 3px solid var(--amber-400); outline-offset:
 
 .num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
 
+.icon { width: 1.15em; height: 1.15em; vertical-align: -0.2em; flex-shrink: 0; }
+.icon-btn .icon { width: 18px; height: 18px; }
+
+.logo-img {
+  width: 34px; height: 34px; border-radius: 9px;
+  display: inline-block; flex-shrink: 0;
+}
+.logo-img--sm { width: 15px; height: 15px; border-radius: 4px; vertical-align: -2.5px; }
+
+/* 底部操作条（引导页） */
+.footer-bar { display: flex; gap: 10px; padding: 4px 16px 16px; }
+.footer-bar .btn { padding: 12px 18px; font-size: 15px; }
+.footer-bar .btn--grow { flex: 1; }
+
 /* ---------- 顶栏 ---------- */
 
 .topbar {
@@ -102,7 +116,6 @@ input:focus, select:focus { outline: 3px solid var(--amber-400); outline-offset:
   padding: 14px 16px 6px;
 }
 .brand { display: flex; align-items: center; gap: 8px; font-weight: 900; font-size: 16px; }
-.brand .logo-emoji { font-size: 20px; }
 .icon-btn {
   border: 3px solid var(--cocoa-900); border-radius: 12px;
   background: var(--card); color: var(--text);
@@ -201,7 +214,7 @@ input:focus, select:focus { outline: 3px solid var(--amber-400); outline-offset:
 
 .settings-list { display: flex; flex-direction: column; gap: 10px; }
 .settings-section { padding: 14px 16px; }
-.settings-section h3 { font-size: 14px; font-weight: 900; margin-bottom: 10px; color: var(--amber-600); }
+.settings-section h3 { display: flex; align-items: center; gap: 7px; font-size: 14px; font-weight: 900; margin-bottom: 10px; color: var(--amber-600); }
 .about-note { font-size: 12px; color: var(--text-2); line-height: 1.6; }
 
 .link-btn { background: none; border: none; color: var(--amber-600); font-weight: 700; cursor: pointer; font-size: 13px; text-decoration: underline; }

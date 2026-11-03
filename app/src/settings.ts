@@ -2,24 +2,25 @@
  * 设置页（方案 §3.4）
  */
 import { invoke, type Profile } from "./api";
+import { icons } from "./icons";
 
 export function renderSettings(root: HTMLElement, profile: Profile, onBack: (p: Profile) => void) {
   const draft: Profile = { ...profile };
 
   root.innerHTML = `
     <div class="topbar">
-      <button class="icon-btn" id="s-back" title="返回">←</button>
-      <div class="brand">⚙ 设置</div>
+      <button class="icon-btn" id="s-back" title="返回">${icons.back}</button>
+      <div class="brand">${icons.gear} 设置</div>
       <button class="btn btn--red" id="s-save" style="padding:7px 14px; font-size:13px">保存</button>
     </div>
     <div class="view settings-list">
       <div class="sticker settings-section">
-        <h3>🐂 牛马档案</h3>
+        <h3>${icons.user} 牛马档案</h3>
         <div class="field"><label>称呼</label><input type="text" id="s-nick" value="${draft.nickname}"></div>
         <div class="field" style="margin-top:10px"><label>月薪（税后 ¥）</label><input type="number" id="s-salary" value="${draft.monthlySalary}"></div>
       </div>
       <div class="sticker settings-section">
-        <h3>⏰ 作息</h3>
+        <h3>${icons.clock} 作息</h3>
         <div class="field-row">
           <div class="field"><label>上班</label><input type="time" id="s-start" value="${draft.workStart}"></div>
           <div class="field"><label>下班</label><input type="time" id="s-end" value="${draft.workEnd}"></div>
@@ -30,14 +31,14 @@ export function renderSettings(root: HTMLElement, profile: Profile, onBack: (p: 
         </div>
       </div>
       <div class="sticker settings-section">
-        <h3>🎯 小目标</h3>
+        <h3>${icons.target} 小目标</h3>
         <div class="field-row">
           <div class="field"><label>名称</label><input type="text" id="s-tn" value="${draft.targetName ?? ""}"></div>
           <div class="field"><label>金额 ¥</label><input type="number" id="s-tp" min="1" value="${draft.targetPrice ?? ""}"></div>
         </div>
       </div>
       <div class="sticker settings-section">
-        <h3>🎨 外观</h3>
+        <h3>${icons.palette} 外观</h3>
         <div class="field"><label>文案皮肤</label>
           <select id="s-skin">
             <option value="meme" ${draft.skin === "meme" ? "selected" : ""}>牛马梗版（圈养中/出栏）</option>
@@ -53,10 +54,10 @@ export function renderSettings(root: HTMLElement, profile: Profile, onBack: (p: 
         </div>
       </div>
       <div class="sticker settings-section">
-        <h3>💾 数据</h3>
+        <h3>${icons.db} 数据</h3>
         <div class="field-row">
-          <button class="btn btn--ghost" id="s-export" style="flex:1">导出 CSV</button>
-          <button class="btn btn--ghost" id="s-opendir" style="flex:1">打开数据目录</button>
+          <button class="btn btn--ghost" id="s-export" style="flex:1">${icons.export} 导出 CSV</button>
+          <button class="btn btn--ghost" id="s-opendir" style="flex:1">${icons.folder} 打开数据目录</button>
         </div>
         <div class="about-note" style="margin-top:10px">
           完全本地存储：无账号、无遥测、无网络请求。<br>
@@ -66,7 +67,7 @@ export function renderSettings(root: HTMLElement, profile: Profile, onBack: (p: 
       <div class="sticker settings-section about-note">
         <b>牛马鼓励器 v0.1.0</b><br>
         把月薪拆到每一秒，实时跳动地"赚"给你看。<br>
-        仅供娱乐，不构成任何劳动报酬依据 🐂🐎
+        仅供娱乐，不构成任何劳动报酬依据。
       </div>
     </div>
   `;
