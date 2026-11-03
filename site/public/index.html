@@ -84,19 +84,6 @@
     }
 
     /* ---------- 顶部导航 ---------- */
-    nav.topbar {
-      position: sticky; top: 0; z-index: 50;
-      background: var(--cream-50);
-      border-bottom: 3px solid var(--cocoa-900);
-    }
-    nav.topbar .container {
-      display: flex; align-items: center; justify-content: space-between; height: 64px;
-    }
-    .brand {
-      display: flex; align-items: center; gap: 10px;
-      font-weight: 900; font-size: 18px; color: var(--cocoa-900); text-decoration: none;
-    }
-    .brand img { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--cocoa-900); }
 
     /* ---------- Hero ---------- */
     .hero { padding: 64px 0 48px; text-align: center; }
@@ -212,15 +199,6 @@
   </style>
 </head>
 <body>
-  <nav class="topbar">
-    <div class="container">
-      <a class="brand" href="#top">
-        <img src="/img/logo.png" alt="牛马鼓励器 logo" />
-        牛马鼓励器
-      </a>
-    </div>
-  </nav>
-
   <header class="hero" id="top">
     <div class="container">
       <img class="hero-logo" src="/img/logo.png" alt="牛马鼓励器 logo：戴加油头巾的奶牛对着时钟打气" />

@@ -62,9 +62,10 @@ jobs:
         shell: bash
         run: |
           mkdir -p artifacts
-          find app/src-tauri/target -mindepth 2 -maxdepth 3 \( -name "*.dmg" -o -name "*.msi" \) -exec cp {} artifacts/ \; 2>/dev/null || true
-          find app/src-tauri/target -mindepth 2 -maxdepth 3 -name "*.exe" -not -name "uninstall*" -exec cp {} artifacts/ \; 2>/dev/null || true
+          # 只收安装包（dmg/msi/NSIS setup.exe），排除裸二进制与卸载器
+          find app/src-tauri/target/release/bundle -type f \( -name "*.dmg" -o -name "*.msi" -o -name "*-setup.exe" \) -exec cp {} artifacts/ \;
           ls -la artifacts/
+          [ -n "$(ls -A artifacts 2>/dev/null)" ] || { echo "::error::no installer artifacts found"; exit 1; }
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
