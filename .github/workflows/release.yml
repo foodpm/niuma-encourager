@@ -65,9 +65,12 @@ jobs:
           # 只收安装包（dmg/msi/NSIS setup.exe），排除裸二进制与卸载器；
           # macOS 交叉编译产物在 target/<triple>/release/bundle，用 *bundle* 通配覆盖
           find app/src-tauri/target -type f \( -name "*.dmg" -o -name "*.msi" -o -name "*-setup.exe" \) -path "*bundle*" -exec cp {} artifacts/ \;
-          # GitHub 资产名不支持非 ASCII（中文 productName 会被剥掉），统一加 ASCII 前缀
+          # GitHub 资产名不支持非 ASCII（中文 productName 会被剥掉）：剥离开头的非安全字符再加前缀
           cd artifacts
-          for f in _*; do [ -e "$f" ] && mv "$f" "NiumaEncourager$f"; done
+          for f in *; do
+            clean=$(printf '%s' "$f" | sed 's/^[^A-Za-z0-9._-]*//')
+            [ "$f" != "$clean" ] && mv "$f" "NiumaEncourager$clean"
+          done
           ls -la
           [ -n "$(ls -A . 2>/dev/null)" ] || { echo "::error::no installer artifacts found"; exit 1; }
 
