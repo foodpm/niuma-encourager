@@ -1,0 +1,16 @@
+name = "niuma-encourager-site"
+compatibility_date = "2026-01-01"
+pages_build_output_dir = "public"
+
+# D1 绑定：先在 Dashboard 或 wrangler d1 create niuma-stats 创建，
+# 再把返回的 database_id 填到下面。
+[[d1_databases]]
+binding = "DB"
+database_name = "niuma-stats"
+database_id = "REPLACE_WITH_YOUR_D1_DATABASE_ID"
+
+# [vars] 为非敏感明文变量；ADMIN_TOKEN 属于敏感信息，用：
+#   本地：cp .dev.vars.example .dev.vars
+#   生产：npx wrangler pages secret put ADMIN_TOKEN
+[vars]
+RELEASE_REPO = "OWNER/niuma-encourager"

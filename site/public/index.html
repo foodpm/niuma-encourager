@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>牛马鼓励器 — 每一秒，都在为你打工</title>
+  <meta name="description" content="牛马鼓励器：一款完全本地的打工人秒薪显示器。菜单栏常驻，工资按秒跳动，每一秒，都在为你打工。" />
+  <link rel="icon" type="image/png" href="/img/favicon.png" />
+  <link rel="apple-touch-icon" href="/img/apple-touch-icon.png" />
+  <meta property="og:title" content="牛马鼓励器 — 每一秒，都在为你打工" />
+  <meta property="og:description" content="菜单栏常驻，工资按秒跳动，完全本地，无需联网。" />
+  <meta property="og:image" content="/img/og-image.png" />
+  <meta name="theme-color" content="#F6A623" />
+  <style>
+    :root {
+      --amber-500: #F6A623;
+      --amber-400: #FFC53D;
+      --amber-600: #E8890C;
+      --cocoa-900: #5B3A1E;
+      --cocoa-700: #7A4E28;
+      --cocoa-100: #F5E9D8;
+      --cream-50: #FFF9EE;
+      --red-500: #E64A2E;
+      --red-600: #C93A20;
+      --ok-500: #3E9B4F;
+      --radius-card: 24px;
+      --radius-btn: 14px;
+      --radius-input: 10px;
+      --font-num: ui-monospace, 'SF Mono', Consolas, monospace;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--cream-50);
+      color: var(--cocoa-900);
+      font-family: system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      overflow-x: hidden;
+    }
+    .num { font-family: var(--font-num); font-variant-numeric: tabular-nums; }
+    .container { max-width: 1080px; margin: 0 auto; padding: 0 20px; }
+    h1, h2, h3 { line-height: 1.15; }
+
+    /* ---------- 贴纸风基础 ---------- */
+    .sticker {
+      background: #fff;
+      border: 3px solid var(--cocoa-900);
+      border-radius: var(--radius-card);
+      box-shadow: 4px 4px 0 rgba(91, 58, 30, .9);
+    }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 12px 22px;
+      border: 3px solid var(--cocoa-900);
+      border-radius: var(--radius-btn);
+      box-shadow: 4px 4px 0 rgba(91, 58, 30, .9);
+      font-size: 16px; font-weight: 800; color: var(--cocoa-900);
+      text-decoration: none; cursor: pointer;
+      transition: transform .12s ease, box-shadow .12s ease;
+      background: #fff;
+    }
+    .btn:hover { transform: translate(-2px, -2px); box-shadow: 6px 6px 0 rgba(91, 58, 30, .9); }
+    .btn:active { transform: translate(3px, 3px); box-shadow: 1px 1px 0 rgba(91, 58, 30, .9); }
+    .btn-amber { background: var(--amber-500); }
+    .btn-amber:hover { background: var(--amber-400); }
+    .btn-cocoa { background: var(--cocoa-900); color: var(--cream-50); }
+    .btn-cocoa:hover { background: var(--cocoa-700); }
+
+    /* ---------- 顶部导航 ---------- */
+    nav.topbar {
+      position: sticky; top: 0; z-index: 50;
+      background: var(--cream-50);
+      border-bottom: 3px solid var(--cocoa-900);
+    }
+    nav.topbar .container {
+      display: flex; align-items: center; justify-content: space-between; height: 64px;
+    }
+    .brand {
+      display: flex; align-items: center; gap: 10px;
+      font-weight: 900; font-size: 18px; color: var(--cocoa-900); text-decoration: none;
+    }
+    .brand img { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--cocoa-900); }
+
+    /* ---------- Hero ---------- */
+    .hero { padding: 64px 0 48px; text-align: center; }
+    .hero-logo {
+      width: 148px; height: 148px; border-radius: 32px;
+      border: 3px solid var(--cocoa-900);
+      box-shadow: 6px 6px 0 rgba(91, 58, 30, .9);
+      animation: floaty 3.2s ease-in-out infinite;
+    }
+    @keyframes floaty { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+    .hero h1 {
+      font-size: clamp(44px, 8vw, 76px); font-weight: 900; margin: 20px 0 8px;
+      letter-spacing: 2px;
+      text-shadow: 3px 3px 0 var(--amber-400);
+    }
+    .hero .slogan {
+      font-size: clamp(18px, 3vw, 26px); color: var(--cocoa-700);
+      font-weight: 600; margin: 0 0 28px;
+    }
+    .dl-row { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+    .btn-dl { font-size: 18px; padding: 14px 28px; }
+    .btn-dl small { display: block; font-size: 12px; font-weight: 600; opacity: .85; }
+    .dl-note { margin-top: 14px; color: var(--cocoa-700); font-size: 13px; }
+
+    /* ---------- 跳动金额演示 ---------- */
+    .demo { padding: 40px 0 72px; }
+    .demo-card {
+      max-width: 560px; margin: 0 auto; padding: 32px 28px; text-align: center;
+      background: var(--cocoa-900); color: var(--cream-50);
+    }
+    .demo-card .label { font-size: 14px; letter-spacing: 4px; color: var(--amber-400); font-weight: 700; }
+    .demo-card .amount {
+      font-family: var(--font-num); font-variant-numeric: tabular-nums;
+      font-size: clamp(40px, 9vw, 60px); font-weight: 700; margin: 10px 0 6px;
+      color: #fff; text-shadow: 0 0 18px rgba(255, 197, 61, .55);
+    }
+    .demo-card .meta { font-size: 13px; color: rgba(255, 246, 232, .75); }
+    .demo-card .meta .rate { color: var(--ok-500); font-weight: 700; }
+    .demo-card .blink { animation: blink 1s steps(2) infinite; }
+    @keyframes blink { 50% { opacity: 0; } }
+
+    /* ---------- 功能 6 卡 ---------- */
+    .section-title {
+      text-align: center; margin: 0 0 8px;
+      font-size: clamp(28px, 5vw, 40px); font-weight: 900;
+      text-shadow: 2px 2px 0 var(--amber-400);
+    }
+    .section-sub { text-align: center; color: var(--cocoa-700); margin: 0 0 32px; }
+    .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    .card { padding: 26px 22px; }
+    .card .ico {
+      width: 54px; height: 54px; display: grid; place-items: center;
+      font-size: 26px; background: var(--cocoa-100);
+      border: 3px solid var(--cocoa-900); border-radius: 14px;
+      margin-bottom: 14px; box-shadow: 3px 3px 0 rgba(91, 58, 30, .9);
+    }
+    .card h3 { margin: 0 0 8px; font-size: 19px; font-weight: 900; }
+    .card p { margin: 0; color: var(--cocoa-700); font-size: 14.5px; line-height: 1.7; }
+    .card.alt { background: var(--cocoa-100); }
+    .card.amber { background: var(--amber-400); }
+    .card.red { background: #FFE4DC; }
+    .card .tag {
+      display: inline-block; margin-top: 12px; font-size: 12px; font-weight: 800;
+      background: var(--amber-500); border: 2px solid var(--cocoa-900);
+      border-radius: 999px; padding: 2px 10px; box-shadow: 2px 2px 0 rgba(91, 58, 30, .9);
+    }
+    .card.red .tag { background: var(--red-500); color: #fff; }
+    .card.amber .tag { background: #fff; }
+
+    /* ---------- FAQ ---------- */
+    .faq { padding: 40px 0 72px; }
+    .faq-list { max-width: 760px; margin: 0 auto; display: grid; gap: 14px; }
+    details.sticker { padding: 0; overflow: hidden; }
+    details.sticker summary {
+      list-style: none; cursor: pointer; padding: 18px 22px;
+      font-size: 17px; font-weight: 800; display: flex; align-items: center; gap: 10px;
+    }
+    details.sticker summary::-webkit-details-marker { display: none; }
+    details.sticker summary::before {
+      content: '+';
+      font-family: var(--font-num); font-size: 20px; font-weight: 900; color: var(--cocoa-900);
+      background: var(--amber-500); border: 2px solid var(--cocoa-900); border-radius: 8px;
+      width: 28px; height: 28px; display: inline-grid; place-items: center; flex: none;
+      box-shadow: 2px 2px 0 rgba(91, 58, 30, .9);
+    }
+    details[open] summary::before { content: '−'; background: var(--red-500); color: #fff; }
+    details.sticker .faq-a { padding: 0 22px 20px 60px; color: var(--cocoa-700); line-height: 1.8; font-size: 15px; }
+    details.sticker .faq-a b { color: var(--cocoa-900); }
+
+    /* ---------- Footer ---------- */
+    footer {
+      border-top: 3px solid var(--cocoa-900);
+      background: var(--cocoa-900); color: var(--cocoa-100);
+      padding: 26px 0; font-size: 14px;
+    }
+    footer .container { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+    footer a { color: var(--amber-400); text-decoration: none; font-weight: 700; }
+    footer a:hover { text-decoration: underline; }
+
+    /* ---------- 响应式 ---------- */
+    @media (max-width: 860px) {
+      .grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 560px) {
+      .grid { grid-template-columns: 1fr; }
+      .hero { padding: 40px 0 32px; }
+      .btn-dl { width: min(320px, 100%); justify-content: center; }
+      footer .container { justify-content: center; text-align: center; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .hero-logo, .demo-card .blink { animation: none; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="topbar">
+    <div class="container">
+      <a class="brand" href="#top">
+        <img src="/img/logo.png" alt="牛马鼓励器 logo" />
+        牛马鼓励器
+      </a>
+      <a class="btn btn-amber" href="/admin" style="padding: 8px 16px; font-size: 14px;">管理后台</a>
+    </div>
+  </nav>
+
+  <header class="hero" id="top">
+    <div class="container">
+      <img class="hero-logo" src="/img/logo.png" alt="牛马鼓励器 logo：戴加油头巾的奶牛对着时钟打气" />
+      <h1>牛马鼓励器</h1>
+      <p class="slogan">每一秒，都在为你打工</p>
+      <div class="dl-row">
+        <a class="btn btn-amber btn-dl" href="/api/dl/macos">
+           macOS
+          <small>macOS 12+ · .dmg</small>
+        </a>
+        <a class="btn btn-cocoa btn-dl" href="/api/dl/windows">
+          ⊞ Windows
+          <small>Windows 10+ · .msi</small>
+        </a>
+      </div>
+      <p class="dl-note">安装包托管在 GitHub Releases · 装完即用，无需注册</p>
+    </div>
+  </header>
+
+  <section class="demo" aria-label="跳动金额演示（纯前端模拟）">
+    <div class="container">
+      <div class="demo-card sticker">
+        <div class="label">今日已赚</div>
+        <div class="amount">¥<span id="demo-int">8,742</span>.<span id="demo-frac">3917</span></div>
+        <div class="meta">
+          时薪 <span class="num rate" id="demo-rate">68</span> 元 · 上午 9:00 — 下午 6:00 ·
+          <span class="blink">●</span> 在岗
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="features" id="features">
+    <div class="container">
+      <h2 class="section-title">功能一览</h2>
+      <p class="section-sub">六个理由，让你看清每一秒的价值</p>
+      <div class="grid">
+        <div class="card sticker">
+          <div class="ico">💰</div>
+          <h3>秒薪跳动</h3>
+          <p>100ms 一跳，工资实时滚动，4 位小数不糊屏。</p>
+          <span class="tag">核心体验</span>
+        </div>
+        <div class="card sticker alt">
+          <div class="ico">⏰</div>
+          <h3>下班倒计时</h3>
+          <p>距离下班还有 2h 14m，谁看谁清醒。</p>
+          <span class="tag">摸鱼神器</span>
+        </div>
+        <div class="card sticker">
+          <div class="ico">📅</div>
+          <h3>月累计</h3>
+          <p>这个月你已经挣了多少，一目了然。</p>
+          <span class="tag">成就感</span>
+        </div>
+        <div class="card sticker amber">
+          <div class="ico">🎯</div>
+          <h3>小目标</h3>
+          <p>先挣它一个亿？从一顿火锅开始，达成有庆祝彩蛋。</p>
+          <span class="tag">彩蛋</span>
+        </div>
+        <div class="card sticker">
+          <div class="ico">📌</div>
+          <h3>托盘常驻</h3>
+          <p>菜单栏 / 托盘常驻，双击随时唤出，不占任务栏。</p>
+          <span class="tag">轻量</span>
+        </div>
+        <div class="card sticker red">
+          <div class="ico">🔒</div>
+          <h3>完全本地</h3>
+          <p>不出网、不上报、不埋点，你的工资只属于你。</p>
+          <span class="tag">隐私承诺</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="faq" id="faq">
+    <div class="container">
+      <h2 class="section-title">FAQ</h2>
+      <p class="section-sub">常见问题，一次说清</p>
+      <div class="faq-list">
+        <details class="sticker" open>
+          <summary>会监控我吗？</summary>
+          <div class="faq-a">
+            <b>不会。</b>牛马鼓励器不截屏、不记录窗口、不检测键盘鼠标。它只做一件事：根据你设置的月薪和作息，本地计算并显示每一秒的薪资跳动。桌面端<b>不做任何上报</b>。
+          </div>
+        </details>
+        <details class="sticker">
+          <summary>数据存哪？</summary>
+          <div class="faq-a">
+            <b>只存在你自己的电脑里。</b>所有数据保存在本机 SQLite 数据库，卸载即消失。官网只统计「点击了下载」这个动作本身，且同 IP 10 分钟去重，不与桌面端数据有任何关联。
+          </div>
+        </details>
+        <details class="sticker">
+          <summary>收费吗？</summary>
+          <div class="faq-a">
+            <b>免费。</b>牛马鼓励器完全免费、完全本地。如果它帮你认清了班的价值，欢迎推荐给同样在打工的朋友。
+          </div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <span>© 2026 牛马鼓励器 · 仅供娱乐</span>
+      <span><a href="/admin">管理后台</a></span>
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      // 纯前端模拟：每帧按「时薪 → 每毫秒」推进金额，4 位小数
+      var intEl = document.getElementById('demo-int');
+      var fracEl = document.getElementById('demo-frac');
+      var RATE_PER_HOUR = 68;            // 模拟时薪（元）
+      var PER_MS = RATE_PER_HOUR / 3600000;
+      var BASE = 8742.3917;              // 演示起始金额
+      var start = performance.now();
+
+      function frame(now) {
+        var earned = BASE + (now - start) * PER_MS;
+        // 保留 4 位小数（先放大取整，避免浮点误差）
+        var fixed = Math.round(earned * 10000) / 10000;
+        var parts = fixed.toFixed(4).split('.');
+        intEl.textContent = Number(parts[0]).toLocaleString('en-US');
+        fracEl.textContent = parts[1];
+        requestAnimationFrame(frame);
+      }
+      requestAnimationFrame(frame);
+      // 页面隐藏时 rAF 自动节流，回到前台继续，无需额外处理
+    })();
+  </script>
+</body>
+</html>

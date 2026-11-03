@@ -1,0 +1,22 @@
+# node
+node_modules/
+dist/
+
+# rust / tauri
+target/
+src-tauri/gen/
+
+# runtime data
+*.db
+*.db-journal
+
+# cloudflare
+.wrangler/
+.dev.vars
+
+# pnpm
+.pnpm-store/
+
+# misc
+.DS_Store
+*.log

@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>牛马鼓励器 · 管理后台</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="icon" type="image/png" href="/img/favicon.png" />
+  <style>
+    :root {
+      --amber-500: #F6A623;
+      --amber-400: #FFC53D;
+      --amber-600: #E8890C;
+      --cocoa-900: #5B3A1E;
+      --cocoa-700: #7A4E28;
+      --cocoa-100: #F5E9D8;
+      --cream-50: #FFF9EE;
+      --red-500: #E64A2E;
+      --red-600: #C93A20;
+      --ok-500: #3E9B4F;
+      --radius-card: 24px;
+      --radius-btn: 14px;
+      --radius-input: 10px;
+      --font-num: ui-monospace, 'SF Mono', Consolas, monospace;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; min-height: 100vh;
+      background: var(--cream-50);
+      color: var(--cocoa-900);
+      font-family: system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    }
+    .num { font-family: var(--font-num); font-variant-numeric: tabular-nums; }
+    .container { max-width: 1080px; margin: 0 auto; padding: 0 20px; }
+    .sticker {
+      background: #fff;
+      border: 3px solid var(--cocoa-900);
+      border-radius: var(--radius-card);
+      box-shadow: 4px 4px 0 rgba(91, 58, 30, .9);
+    }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 10px 18px;
+      border: 3px solid var(--cocoa-900);
+      border-radius: var(--radius-btn);
+      box-shadow: 4px 4px 0 rgba(91, 58, 30, .9);
+      font-size: 15px; font-weight: 800; color: var(--cocoa-900);
+      text-decoration: none; cursor: pointer;
+      transition: transform .12s ease, box-shadow .12s ease;
+      background: #fff;
+    }
+    .btn:hover { transform: translate(-2px, -2px); box-shadow: 6px 6px 0 rgba(91, 58, 30, .9); }
+    .btn:active { transform: translate(3px, 3px); box-shadow: 1px 1px 0 rgba(91, 58, 30, .9); }
+    .btn:disabled { opacity: .55; cursor: wait; transform: none; box-shadow: 4px 4px 0 rgba(91, 58, 30, .9); }
+    .btn-amber { background: var(--amber-500); }
+    .btn-amber:hover { background: var(--amber-400); }
+    .btn-cocoa { background: var(--cocoa-900); color: var(--cream-50); }
+    .btn-cocoa:hover { background: var(--cocoa-700); }
+
+    /* ---------- 顶栏 ---------- */
+    .topbar { border-bottom: 3px solid var(--cocoa-900); background: var(--cream-50); }
+    .topbar .container { display: flex; align-items: center; justify-content: space-between; gap: 12px; height: 64px; }
+    .brand { display: flex; align-items: center; gap: 10px; font-weight: 900; font-size: 18px; text-decoration: none; color: var(--cocoa-900); }
+    .brand img { width: 40px; height: 40px; border-radius: 10px; border: 2px solid var(--cocoa-900); }
+    .top-actions { display: flex; align-items: center; gap: 10px; }
+    .badge {
+      font-size: 12px; font-weight: 800; padding: 3px 10px;
+      border: 2px solid var(--cocoa-900); border-radius: 999px;
+      background: var(--cocoa-100); max-width: 180px;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .badge.ok { background: #E3F2E5; }
+
+    /* ---------- 登录卡 ---------- */
+    .login-wrap { display: grid; place-items: center; padding: 72px 20px; }
+    .login-card { width: min(400px, 100%); padding: 32px 28px; text-align: center; }
+    .login-card .ico { font-size: 40px; }
+    .login-card h1 { font-size: 24px; font-weight: 900; margin: 10px 0 6px; }
+    .login-card p { color: var(--cocoa-700); font-size: 14px; margin: 0 0 20px; line-height: 1.7; }
+    .login-card input {
+      width: 100%; padding: 12px 14px;
+      border: 3px solid var(--cocoa-900); border-radius: var(--radius-input);
+      font-family: var(--font-num); font-size: 15px;
+      background: var(--cream-50); color: var(--cocoa-900);
+      outline: none; margin-bottom: 14px;
+    }
+    .login-card input:focus { box-shadow: 3px 3px 0 rgba(91, 58, 30, .9); }
+    .login-card .btn { width: 100%; justify-content: center; }
+    .login-err { color: var(--red-600); font-size: 13px; font-weight: 700; min-height: 18px; margin: 12px 0 0; }
+
+    /* ---------- 看板 ---------- */
+    .board { display: none; padding: 28px 0 64px; }
+    .board-head { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 20px; }
+    .board-head h1 { font-size: clamp(24px, 4vw, 34px); font-weight: 900; margin: 0; text-shadow: 2px 2px 0 var(--amber-400); }
+    .board-head .sub { color: var(--cocoa-700); font-size: 13px; margin-top: 4px; }
+    .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 20px; }
+    .stat { padding: 20px; }
+    .stat .k { font-size: 13px; font-weight: 800; color: var(--cocoa-700); letter-spacing: 1px; }
+    .stat .v { font-family: var(--font-num); font-variant-numeric: tabular-nums; font-size: 34px; font-weight: 700; margin-top: 6px; }
+    .stat .s { font-size: 12px; color: var(--cocoa-700); margin-top: 4px; }
+    .stat .ico { width: 38px; height: 38px; display: grid; place-items: center; font-size: 19px; background: var(--cocoa-100); border: 2px solid var(--cocoa-900); border-radius: 10px; box-shadow: 2px 2px 0 rgba(91, 58, 30, .9); margin-bottom: 10px; }
+    .stat.c-amber { background: var(--amber-400); }
+    .stat.c-cocoa { background: var(--cocoa-900); color: var(--cream-50); }
+    .stat.c-cocoa .k, .stat.c-cocoa .s { color: var(--cocoa-100); }
+    .stat.c-red { background: #FFE4DC; }
+
+    .panel { padding: 22px; margin-bottom: 20px; }
+    .panel h2 { margin: 0 0 4px; font-size: 18px; font-weight: 900; }
+    .panel .hint { color: var(--cocoa-700); font-size: 12.5px; margin: 0 0 18px; }
+    .legend { display: flex; gap: 16px; align-items: center; font-size: 12.5px; font-weight: 700; color: var(--cocoa-700); margin-bottom: 12px; flex-wrap: wrap; }
+    .dot { display: inline-block; width: 12px; height: 12px; border: 2px solid var(--cocoa-900); border-radius: 4px; vertical-align: -1px; margin-right: 5px; }
+    .dot.macos { background: var(--amber-500); }
+    .dot.windows { background: var(--cocoa-900); }
+
+    /* 纯 CSS 柱状图 */
+    .chart {
+      display: grid; grid-template-columns: repeat(14, 1fr);
+      gap: 8px; align-items: end; height: 220px;
+      padding: 0 4px; border-bottom: 3px solid var(--cocoa-900);
+    }
+    .col { display: flex; flex-direction: column; justify-content: flex-end; height: 100%; gap: 2px; }
+    .bar { border: 2px solid var(--cocoa-900); border-radius: 6px 6px 0 0; min-height: 2px; }
+    .bar.macos { background: var(--amber-500); }
+    .bar.windows { background: var(--cocoa-900); }
+    .bar.empty { border-color: transparent; background: transparent; }
+    .chart-x { display: grid; grid-template-columns: repeat(14, 1fr); gap: 8px; padding: 8px 4px 0; }
+    .chart-x span { font-family: var(--font-num); font-size: 10.5px; color: var(--cocoa-700); text-align: center; transform: rotate(-38deg); white-space: nowrap; }
+
+    /* 明细表 */
+    .tbl-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    th, td { text-align: left; padding: 10px 12px; }
+    thead th { background: var(--cocoa-900); color: var(--cream-50); font-size: 12.5px; letter-spacing: 1px; position: sticky; top: 0; }
+    thead th:first-child { border-radius: 10px 0 0 0; }
+    thead th:last-child { border-radius: 0 10px 0 0; }
+    tbody tr:nth-child(even) { background: var(--cream-50); }
+    tbody tr { border-bottom: 2px solid var(--cocoa-100); }
+    td.c { font-family: var(--font-num); font-variant-numeric: tabular-nums; font-weight: 700; }
+    .plat { display: inline-block; font-size: 12px; font-weight: 800; padding: 2px 10px; border: 2px solid var(--cocoa-900); border-radius: 999px; }
+    .plat.macos { background: var(--amber-500); }
+    .plat.windows { background: var(--cocoa-900); color: var(--cream-50); }
+    .empty-tip { text-align: center; color: var(--cocoa-700); padding: 26px 0; font-size: 14px; }
+
+    .toast {
+      position: fixed; left: 50%; bottom: 26px; transform: translateX(-50%);
+      background: var(--cocoa-900); color: var(--cream-50);
+      border: 3px solid var(--cocoa-900); border-radius: var(--radius-btn);
+      box-shadow: 4px 4px 0 rgba(91, 58, 30, .9);
+      padding: 10px 18px; font-size: 14px; font-weight: 700;
+      opacity: 0; pointer-events: none; transition: opacity .2s ease;
+      z-index: 99;
+    }
+    .toast.show { opacity: 1; }
+    .toast.err { background: var(--red-600); }
+
+    @media (max-width: 860px) {
+      .stat-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 520px) {
+      .stat-grid { grid-template-columns: 1fr 1fr; }
+      .stat .v { font-size: 26px; }
+      .chart, .chart-x { gap: 4px; }
+      .chart-x span { font-size: 9px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="container">
+      <a class="brand" href="/">
+        <img src="/img/logo.png" alt="牛马鼓励器 logo" />
+        牛马鼓励器 · 后台
+      </a>
+      <div class="top-actions" id="top-actions" style="display: none;">
+        <span class="badge ok" id="token-badge" title="">已登录</span>
+        <button class="btn" id="btn-refresh">↻ 刷新</button>
+        <button class="btn btn-cocoa" id="btn-logout">退出</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 未登录 -->
+  <div class="login-wrap" id="login-view">
+    <form class="login-card sticker" id="login-form">
+      <div class="ico">🔐</div>
+      <h1>管理后台</h1>
+      <p>输入管理 Token 查看下载统计。<br />Token 保存在本机 localStorage，不会上传。</p>
+      <input type="password" id="token-input" placeholder="ADMIN_TOKEN" autocomplete="current-password" autofocus />
+      <button class="btn btn-amber" type="submit">进入看板</button>
+      <div class="login-err" id="login-err"></div>
+    </form>
+  </div>
+
+  <!-- 看板 -->
+  <main class="board container" id="board-view">
+    <div class="board-head">
+      <div>
+        <h1>下载看板</h1>
+        <div class="sub">数据来源 Cloudflare D1 · 只统计官网下载点击 · 同 IP 10 分钟去重</div>
+      </div>
+    </div>
+
+    <div class="stat-grid">
+      <div class="stat sticker c-amber">
+        <div class="ico">📦</div>
+        <div class="k">总下载</div>
+        <div class="v" id="st-total">—</div>
+        <div class="s">mac <span id="st-total-mac">—</span> · win <span id="st-total-win">—</span></div>
+      </div>
+      <div class="stat sticker">
+        <div class="ico">☀️</div>
+        <div class="k">今日下载</div>
+        <div class="v" id="st-today">—</div>
+        <div class="s">mac <span id="st-today-mac">—</span> · win <span id="st-today-win">—</span></div>
+      </div>
+      <div class="stat sticker">
+        <div class="ico">📆</div>
+        <div class="k">本周下载</div>
+        <div class="v" id="st-week">—</div>
+        <div class="s">近 7 天（含今天）</div>
+      </div>
+      <div class="stat sticker c-red">
+        <div class="ico">🧍</div>
+        <div class="k">今日独立 IP</div>
+        <div class="v" id="st-uv">—</div>
+        <div class="s">ip-hash 去重</div>
+      </div>
+    </div>
+
+    <div class="panel sticker">
+      <h2>近 14 天下载趋势</h2>
+      <p class="hint">按天聚合，按平台分色堆叠 · 悬停查看数值</p>
+      <div class="legend">
+        <span><i class="dot macos"></i>macOS</span>
+        <span><i class="dot windows"></i>Windows</span>
+      </div>
+      <div class="chart" id="chart"></div>
+      <div class="chart-x" id="chart-x"></div>
+    </div>
+
+    <div class="panel sticker">
+      <h2>版本明细</h2>
+      <p class="hint">平台 × 版本 × 下载次数</p>
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr><th>平台</th><th>版本</th><th>次数</th></tr>
+          </thead>
+          <tbody id="tbl-body"></tbody>
+        </table>
+        <div class="empty-tip" id="tbl-empty" style="display:none;">还没有下载数据，去官网吆喝两声吧 🐮</div>
+      </div>
+    </div>
+  </main>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    (function () {
+      var LS_KEY = 'niuma_admin_token';
+      var $ = function (id) { return document.getElementById(id); };
+
+      var loginView = $('login-view');
+      var boardView = $('board-view');
+      var token = localStorage.getItem(LS_KEY) || '';
+
+      function toast(msg, isErr) {
+        var t = $('toast');
+        t.textContent = msg;
+        t.className = 'toast show' + (isErr ? ' err' : '');
+        clearTimeout(t._timer);
+        t._timer = setTimeout(function () { t.className = 'toast'; }, 2200);
+      }
+
+      function showLogin(errMsg) {
+        token = '';
+        boardView.style.display = 'none';
+        $('top-actions').style.display = 'none';
+        loginView.style.display = 'grid';
+        $('login-err').textContent = errMsg || '';
+      }
+
+      function showBoard() {
+        loginView.style.display = 'none';
+        boardView.style.display = 'block';
+        $('top-actions').style.display = 'flex';
+        var badge = $('token-badge');
+        badge.textContent = 'Token ····' + token.slice(-4);
+        badge.title = '已保存到 localStorage';
+      }
+
+      function setCards(prefix, obj) {
+        $(prefix).textContent = obj.all || 0;
+        $(prefix + '-mac').textContent = obj.macos || 0;
+        $(prefix + '-win').textContent = obj.windows || 0;
+      }
+
+      function esc(s) {
+        return String(s).replace(/[&<>"']/g, function (c) {
+          return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+        });
+      }
+
+      function render(data) {
+        setCards('st-total', data.totals || {});
+        setCards('st-today', data.today || {});
+        var w = data.week || {};
+        $('st-week').textContent = w.all || 0;
+        $('st-uv').textContent = data.todayUniqueIps || 0;
+
+        // ---- 14 天柱状图（纯 CSS，按平台堆叠）----
+        var daily = data.daily || [];
+        var chart = $('chart');
+        var chartX = $('chart-x');
+        chart.innerHTML = '';
+        chartX.innerHTML = '';
+        var max = 1;
+        daily.forEach(function (d) { max = Math.max(max, (d.macos || 0) + (d.windows || 0)); });
+        daily.forEach(function (d) {
+          var col = document.createElement('div');
+          col.className = 'col';
+          var total = (d.macos || 0) + (d.windows || 0);
+          [['macos', d.macos], ['windows', d.windows]].forEach(function (p) {
+            var b = document.createElement('div');
+            b.className = 'bar ' + p[0];
+            b.style.height = (total ? (p[1] || 0) / max * 100 : 0) + '%';
+            if (!p[1]) { b.classList.add('empty'); b.style.height = '0'; }
+            col.appendChild(b);
+          });
+          col.title = d.date + ' · macOS ' + (d.macos || 0) + ' · Windows ' + (d.windows || 0) + ' · 共 ' + total;
+          chart.appendChild(col);
+          var x = document.createElement('span');
+          x.textContent = d.date ? d.date.slice(5) : '';
+          chartX.appendChild(x);
+        });
+
+        // ---- 明细表 ----
+        var rows = data.byPlatform || [];
+        var tb = $('tbl-body');
+        tb.innerHTML = '';
+        rows.forEach(function (r) {
+          var tr = document.createElement('tr');
+          tr.innerHTML =
+            '<td><span class="plat ' + esc(r.platform) + '">' + (r.platform === 'macos' ? 'macOS' : 'Windows') + '</span></td>' +
+            '<td class="num">' + esc(r.version || 'unknown') + '</td>' +
+            '<td class="c">' + (r.count || 0) + '</td>';
+          tb.appendChild(tr);
+        });
+        $('tbl-empty').style.display = rows.length ? 'none' : 'block';
+      }
+
+      function load() {
+        $('btn-refresh').disabled = true;
+        fetch('/api/stats', { headers: { 'Authorization': 'Bearer ' + token } })
+          .then(function (res) {
+            if (res.status === 401) { showLogin('Token 无效或已过期，请重新输入'); throw new Error('unauthorized'); }
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+            return res.json();
+          })
+          .then(function (data) { render(data); toast('已刷新 · ' + new Date().toLocaleTimeString()); })
+          .catch(function (e) {
+            if (e.message !== 'unauthorized') toast('加载失败：' + e.message + '（本地打开时可用演示模式）', true);
+          })
+          .finally(function () { $('btn-refresh').disabled = false; });
+      }
+
+      // ---- 登录 ----
+      $('login-form').addEventListener('submit', function (ev) {
+        ev.preventDefault();
+        var v = $('token-input').value.trim();
+        if (!v) { $('login-err').textContent = '请输入 Token'; return; }
+        token = v;
+        localStorage.setItem(LS_KEY, v);
+        showBoard();
+        load();
+      });
+
+      $('btn-logout').addEventListener('click', function () {
+        localStorage.removeItem(LS_KEY);
+        $('token-input').value = '';
+        showLogin('');
+      });
+
+      $('btn-refresh').addEventListener('click', load);
+
+      // ---- 启动 ----
+      if (token) { showBoard(); load(); } else { showLogin(''); }
+    })();
+  </script>
+</body>
+</html>

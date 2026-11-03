@@ -1,0 +1,89 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build ${{ matrix.label }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - label: macOS (Apple Silicon)
+            os: macos-14
+            args: "--target aarch64-apple-darwin"
+          - label: macOS (Intel)
+            os: macos-14
+            args: "--target x86_64-apple-darwin"
+          - label: Windows
+            os: windows-latest
+            args: ""
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.label == 'macOS (Intel)' && 'x86_64-apple-darwin' || (matrix.label == 'macOS (Apple Silicon)' && 'aarch64-apple-darwin' || '') }}
+
+      - name: Rust cache
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: app/src-tauri
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install frontend deps
+        working-directory: app
+        run: pnpm install --frozen-lockfile
+
+      - name: Build app (bundle)
+        working-directory: app
+        run: pnpm tauri build ${{ matrix.args }}
+
+      - name: Collect artifacts
+        shell: bash
+        run: |
+          mkdir -p artifacts
+          find app/src-tauri/target -mindepth 2 -maxdepth 3 \( -name "*.dmg" -o -name "*.msi" \) -exec cp {} artifacts/ \; 2>/dev/null || true
+          find app/src-tauri/target -mindepth 2 -maxdepth 3 -name "*.exe" -not -name "uninstall*" -exec cp {} artifacts/ \; 2>/dev/null || true
+          ls -la artifacts/
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: bundles-${{ matrix.os }}-${{ strategy.job-index }}
+          path: artifacts/
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts/
+          merge-multiple: true
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: artifacts/*
+          generate_release_notes: true
