@@ -69,10 +69,12 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
 
   // 查 latest release（follow redirect；未发布 latest 时 fallback 到 releases 列表第一条）
   const apiBase = (env.GITHUB_API_BASE || 'https://api.github.com').replace(/\/+$/, '');
-  const ghHeaders = {
+  const ghHeaders: Record<string, string> = {
     'User-Agent': 'niuma-encourager-site',
     Accept: 'application/vnd.github+json',
   };
+  // 可选 token：避免 Cloudflare 边缘共享 IP 撞 GitHub 匿名限流（60/h）
+  if (env.GITHUB_TOKEN) ghHeaders.Authorization = `Bearer ${env.GITHUB_TOKEN}`;
   let release: { tag_name?: string; assets?: { name: string; browser_download_url: string }[] } | null = null;
   let ghRes = await fetch(`${apiBase}/repos/${repo}/releases/latest`, {
     headers: ghHeaders,

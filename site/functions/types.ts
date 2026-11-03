@@ -11,6 +11,8 @@ export interface Env {
   RELEASE_REPO: string;
   /** GitHub API 基地址（默认 https://api.github.com，可指向镜像；测试用） */
   GITHUB_API_BASE?: string;
+  /** GitHub token（可选）：提高 api.github.com 速率限制（匿名 60/h → 5000/h），避免边缘 IP 共享限流导致下载 404 */
+  GITHUB_TOKEN?: string;
   /** 管理后台 Token（生产为 secret，本地 .dev.vars） */
   ADMIN_TOKEN?: string;
 }
